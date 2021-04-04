@@ -91,6 +91,7 @@ class Page:
             An exception if anything went wrong while downloading image.
         """
         if self.imageUrl is None:
+            logger.error('Cannot download page %d (%s), imageUrl is None.', self.idx, self.pageUrl)
             raise ValueError('Cannot download image, imageUrl is None.')
 
         response = requests.get(self.imageUrl, stream=True)
@@ -126,9 +127,11 @@ class Chapter:
                  pages: List[Page] = None) -> None:
 
         if idx < 1:
+            logger.error('Failed to initialize chapter, index %d is invalid.', idx)
             raise ValueError('The index must be a positive number.')
 
         if url is None or url == '':
+            logger.error('Failed to initialize chapter %d, URL is None.', idx)
             raise ValueError('The URL must not be None.')
 
         if title is None:
@@ -169,9 +172,11 @@ class BaseMangaCrawler(ABC):
         super().__init__()
 
         if url is None or url == '':
+            logger.error('Failed to initialize Manga, URL is None.')
             raise ValueError('The URL must not be None.')
 
         if baseDirPath is None or baseDirPath == '':
+            logger.error('Failed to initialize Manga, baseDirPath is None.')
             raise ValueError('The baseDirPath must not be None.')
 
         self.url: str = url
@@ -410,6 +415,7 @@ class BaseMangaCrawler(ABC):
         fetch the manga soup and initialize the title.
         """
         if self.url is None or self.url == '':
+            logger.error('Failed to initialize manga title, manga URL is None.')
             raise ValueError('Manga URL must not be None.')
 
         if self.title is not None and self.title != '':

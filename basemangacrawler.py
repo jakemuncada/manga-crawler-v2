@@ -586,6 +586,13 @@ class BaseMangaCrawler(ABC):
         """
 
     @abstractmethod
+    def isMangaPaginated(self) -> bool:
+        """
+        Returns true if the manga is paginated.
+        In other words, if not all chapters are listed on the main manga HTML page.
+        """
+
+    @abstractmethod
     def getNextMangaPagination(self, mangaSoup: BeautifulSoup) -> str:
         """
         Get the URL of the next pagination of the manga HTML page.
@@ -599,6 +606,13 @@ class BaseMangaCrawler(ABC):
 
         Returns:
             The URL of the next pagination. None if there is no next pagination.
+        """
+
+    @abstractmethod
+    def isChapterPaginated(self) -> bool:
+        """
+        Returns true if the chapter is paginated.
+        In other words, if not all pages are listed on the chapter HTML page.
         """
 
     @abstractmethod

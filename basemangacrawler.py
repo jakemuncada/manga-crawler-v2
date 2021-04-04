@@ -105,6 +105,17 @@ class Page:
 
         del response
 
+    def toDict(self) -> dict:
+        """
+        Returns the dictionary representation of the Page.
+        """
+        return {
+            'idx': self.idx,
+            'pageUrl': self.pageUrl,
+            'dirPath': os.path.abspath(self.dirPath),
+            'imageUrl': self.imageUrl
+        }
+
 
 ####################################################################################################
 #  CHAPTER
@@ -143,6 +154,33 @@ class Chapter:
         self.dirPath: str = dirPath
         self.pages: List[Page] = [] if pages is None else pages
 
+    @property
+    def hasPages(self) -> bool:
+        """
+        True if the pages list is populated with pages. False otherwise.
+        """
+        return self.pages is not None and len(self.pages) > 0
+
+    @property
+    def isDownloaded(self) -> bool:
+        """
+        True if the pages list is populated with pages and all of them
+        have already been downloaded. False otherwise.
+        """
+        return self.hasPages and all(page.fileExists() for page in self.pages)
+
+    def toDict(self) -> dict:
+        """
+        Returns the dictionary representation of the Chapter.
+        """
+        return {
+            'idx': self.idx,
+            'url': self.url,
+            'title': self.title,
+            'dirPath': os.path.abspath(self.dirPath),
+            'pages': [page.toDict() for page in self.pages]
+        }
+
 
 ####################################################################################################
 #  BASE MANGA CRAWLER
@@ -152,7 +190,7 @@ class BaseMangaCrawler(ABC):
     """
     An abstract base class for a Manga.
 
-    Parameters:
+    Attributes:
         url: The main URL of the manga.
         baseDirPath: The path of the base output directory.
         dirPath: The path of the directory where the manga will be saved.
@@ -216,6 +254,20 @@ class BaseMangaCrawler(ABC):
         self._chapterProgress: tqdm = None  # The chapter progress bar
         self._pageProgress: tqdm = None     # The page progress bar
 
+    def toDict(self) -> dict:
+        """
+        Returns the dictionary representation of the MangaCrawler.
+        """
+        return {
+            'url': self.url,
+            'title': self.title,
+            'baseDirPath': os.path.abspath(self.baseDirPath),
+            'dirPath': os.path.abspath(self.dirPath),
+            'cachePath': os.path.abspath(self.cachePath),
+            'numChapterThreads': self.numChapterThreads,
+            'numPageThreads': self.numPageThreads,
+            'chapters': [chapter.toDict() for chapter in self.chapters]
+        }
     def terminate(self) -> None:
         """
         Terminate the download by setting the kill event.

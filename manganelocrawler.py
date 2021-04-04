@@ -14,9 +14,6 @@ class ManganeloCrawler(BaseMangaCrawler):
     The crawler for https://manganelo.com/
     """
 
-    def __init__(self, url: str, baseDirPath: str) -> None:
-        super().__init__(url, baseDirPath)
-
     def parseMangaTitle(self, mangaSoup: BeautifulSoup) -> str:
         """
         Parse the manga title from the soup.
@@ -63,6 +60,13 @@ class ManganeloCrawler(BaseMangaCrawler):
         result = sorted(result, key=lambda item: item.idx)
         return result
 
+    def isMangaPaginated(self) -> bool:
+        """
+        Returns true if the manga is paginated.
+        In other words, if not all chapters are listed on the main manga HTML page.
+        """
+        return False
+
     def getNextMangaPagination(self, mangaSoup: BeautifulSoup) -> str:
         """
         Get the URL of the next pagination of the manga HTML page.
@@ -79,6 +83,13 @@ class ManganeloCrawler(BaseMangaCrawler):
         """
         # There is no manga pagination
         return None
+
+    def isChapterPaginated(self) -> bool:
+        """
+        Returns true if the chapter is paginated.
+        In other words, if not all pages are listed on the chapter HTML page.
+        """
+        return False
 
     def getNextChapterPagination(self, chapterSoup: BeautifulSoup) -> str:
         """

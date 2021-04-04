@@ -23,11 +23,25 @@ console = logging.getLogger("console")
 @arg('-o', '--output', help='The output path of the manga.')
 @arg('-c', '--cthreads', type=int, help='The number of chapter processing threads.')
 @arg('-p', '--pthreads', type=int, help='The number of page downloading threads.')
-def manganelo(url: str, output: str = "./output", cthreads: int = 3, pthreads: int = 5):
+@arg('--cache', help='The path of the cache file.')
+def manganelo(url: str, output: str = "./output", cthreads: int = 3, pthreads: int = 5,
+              cache: str = None):
     """
     Download a manga from https://manganelo.com.
     """
-    crawler = ManganeloCrawler(url, output)
+    try:
+        crawler = ManganeloCrawler(url, output, dirPath=None, cachePath=cache,
+                                   title=None, chapters=None, numChapterThreads=cthreads,
+                                   numPageThreads=pthreads)
+
+    except ValueError as err:
+        console.error(str(err))
+        return
+
+    except FileNotFoundError as err:
+        console.error(str(err))
+        return
+
     crawler.numChapterThreads = cthreads
     crawler.numPageThreads = pthreads
     crawler.download()
@@ -37,35 +51,42 @@ def manganelo(url: str, output: str = "./output", cthreads: int = 3, pthreads: i
 @arg('-o', '--output', help='The output path of the manga.')
 @arg('-c', '--cthreads', type=int, help='The number of chapter processing threads.')
 @arg('-p', '--pthreads', type=int, help='The number of page downloading threads.')
-def mangapanda(url: str, output: str = "./output", cthreads: int = 3, pthreads: int = 5):
+@arg('--cache', help='The path of the cache file.')
+def mangapanda(url: str, output: str = "./output", cthreads: int = 3, pthreads: int = 5,
+               cache: str = None):
     """
     Download a manga from https://manga-panda.xyz.
     """
-    crawler = MangaPandaCrawler(url, output)
+    try:
+        crawler = MangaPandaCrawler(url, output, dirPath=None, cachePath=cache,
+                                    title=None, chapters=None, numChapterThreads=cthreads,
+                                    numPageThreads=pthreads)
+
+    except ValueError as err:
+        console.error(str(err))
+        return
+
+    except FileNotFoundError as err:
+        console.error(str(err))
+        return
+
     crawler.numChapterThreads = cthreads
     crawler.numPageThreads = pthreads
     crawler.download()
 
 
-@arg('-f', '--filepath', help='The input filepath.  \
+@arg('-i', '--filepath', help='The input filepath.  \
     Each manga to be downloaded is listed in the input file.')
 @arg('-o', '--output', help='The output path of the manga.')
 @arg('-c', '--cthreads', type=int, help='The number of chapter processing threads.')
 @arg('-p', '--pthreads', type=int, help='The number of page downloading threads.')
+@arg('--cache', help='The path of the cache file.')
 def download(filepath: str = './urls.txt', output: str = './output',
-             cthreads: int = 3, pthreads: int = 5):
+             cthreads: int = 3, pthreads: int = 5, cache: str = None):
     """
     Download a list of manga. An input file is required.
-    The input file should be either a JSON file or a txt file.
+    The input file should be a txt file.
     """
-    if cthreads < 1:
-        console.error('Invalid number of chapter processing threads.')
-        return
-
-    if pthreads < 1:
-        console.error('Invalid number of page downloading threads.')
-        return
-
     if not os.path.exists(filepath):
         console.error('The input file at %s does not exist', filepath)
         return
@@ -85,12 +106,17 @@ def download(filepath: str = './urls.txt', output: str = './output',
 
             try:
                 if url.startswith('https://manganelo.com'):
-                    crawler = ManganeloCrawler(url, output)
+                    crawler = ManganeloCrawler(url, output, cache)
                 elif url.startswith('http://manga-panda.xyz'):
-                    crawler = MangaPandaCrawler(url, output)
+                    crawler = MangaPandaCrawler(url, output, cache)
 
             except ValueError as err:
                 console.error(str(err))
+                return
+
+            except FileNotFoundError as err:
+                console.error(str(err))
+                return
 
             crawler.numChapterThreads = cthreads
             crawler.numPageThreads = pthreads

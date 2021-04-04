@@ -14,9 +14,6 @@ class ManganeloCrawler(BaseMangaCrawler):
     The crawler for https://manganelo.com/
     """
 
-    def __init__(self, url: str, baseDirPath: str) -> None:
-        super().__init__(url, baseDirPath)
-
     def parseMangaTitle(self, mangaSoup: BeautifulSoup) -> str:
         """
         Parse the manga title from the soup.

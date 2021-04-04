@@ -156,15 +156,20 @@ class BaseMangaCrawler(ABC):
         url: The main URL of the manga.
         baseDirPath: The path of the base output directory.
         dirPath: The path of the directory where the manga will be saved.
+        cachePath: The path of the JSON cache file.
         title: The title of the manga.
         chapters: The chapters of the manga.
+        numChapterThreads: The number of chapter processing threads.
+        numPageThreads: The number of page downloading threads.
 
     Raises:
         ValueError: When the given parameters are invalid.
+        FileNotFoundError: When the cachePath is specified, but file was not found.
     """
 
     def __init__(self, url: str, baseDirPath: str, dirPath: str = None,
-                 title: str = None, chapters: List[Chapter] = None) -> None:
+                 cachePath: str = None, title: str = None, chapters: List[Chapter] = None,
+                 numChapterThreads: int = 3, numPageThreads: int = 5) -> None:
 
         super().__init__()
 
@@ -176,19 +181,34 @@ class BaseMangaCrawler(ABC):
             logger.error('Failed to initialize Manga, baseDirPath is None.')
             raise ValueError('The baseDirPath must not be None.')
 
+        if cachePath is not None and not os.path.exists(cachePath):
+            logger.error('Failed to initialize Manga, cache file not found at %s.', cachePath)
+            raise FileNotFoundError(f'Cache file not found at {cachePath}.')
+
+        if numChapterThreads < 1:
+            logger.error('Failed to initialize Manga, invalid numChapterThreads: %d.',
+                         numChapterThreads)
+            raise ValueError('Invalid number of chapter processing threads.')
+
+        if numPageThreads < 1:
+            logger.error('Failed to initialize Manga, invalid numPageThreads: %d.',
+                         numPageThreads)
+            raise ValueError('Invalid number of page downloading threads.')
+
         self.url: str = url
         self.title: str = title
         self.baseDirPath: str = baseDirPath
         self.dirPath: str = dirPath
+        self.cachePath: str = cachePath
         self.chapters: List[Chapter] = [] if chapters is None else chapters
+
+        self.numChapterThreads: int = numChapterThreads     # The number of chapter threads
+        self.numPageThreads: int = numPageThreads           # The number of page threads
 
         self._killEvent = Event()       # Terminates the download
 
         self._chapterQueue = Queue()    # The chapter processing queue
         self._pageQueue = Queue()       # The page processing queue
-
-        self.numChapterThreads: int = 3
-        self.numPageThreads: int = 5
 
         self._chapterThreads: List[Thread] = []     # The chapter worker threads
         self._pageThreads: List[Thread] = []        # The page worker threads

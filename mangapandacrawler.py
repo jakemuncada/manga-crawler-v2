@@ -157,7 +157,7 @@ class MangaPandaCrawler(BaseMangaCrawler):
             page = Page(idx + 1, url, chapter.dirPath, imageUrl)
             result.append(page)
 
-        return result[:20] if len(result) > 20 else result
+        return result
 
     def parseImageUrl(self, pageSoup: BeautifulSoup) -> str:
         """

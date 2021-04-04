@@ -121,9 +121,16 @@ def download(filepath: str = './urls.txt', output: str = './output',
             crawler.numChapterThreads = cthreads
             crawler.numPageThreads = pthreads
             crawler.download()
+            crawler.saveCache()
 
     except KeyboardInterrupt:
         if crawler is not None:
+            try:
+                crawler.saveCache()
+            except Exception as err:  # pylint: disable=broad-except
+                logger.exception('[%s] Failed to save cache, %s', url, err)
+                console.error('Failed to save cache.')
+
             crawler.terminate()
             console.info('Keyboard interrupt detected. '
                          'Please wait while threads are terminated...')

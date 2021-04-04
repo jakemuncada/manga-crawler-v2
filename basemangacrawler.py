@@ -213,8 +213,8 @@ class BaseMangaCrawler(ABC):
         self._chapterThreads: List[Thread] = []     # The chapter worker threads
         self._pageThreads: List[Thread] = []        # The page worker threads
 
-        self._chapterProgress: tqdm = None
-        self._pageProgress: tqdm = None
+        self._chapterProgress: tqdm = None  # The chapter progress bar
+        self._pageProgress: tqdm = None     # The page progress bar
 
     def terminate(self) -> None:
         """

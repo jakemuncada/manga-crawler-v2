@@ -157,13 +157,10 @@ class BaseMangaCrawler(ABC):
         baseDirPath: The path of the base output directory.
         dirPath: The path of the directory where the manga will be saved.
         title: The title of the manga.
-
-    Attributes:
-        url: The manga URL.
-        title: The manga title.
-        baseDirPath: The path of the base output directory.
-        dirPath: The path of the directory where the manga will be saved.
         chapters: The chapters of the manga.
+
+    Raises:
+        ValueError: When the given parameters are invalid.
     """
 
     def __init__(self, url: str, baseDirPath: str, dirPath: str = None,

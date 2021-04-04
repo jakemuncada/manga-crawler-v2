@@ -83,10 +83,14 @@ def download(filepath: str = './urls.txt', output: str = './output',
             console.info(msg)
             console.info('-' * len(msg))
 
-            if url.startswith('https://manganelo.com'):
-                crawler = ManganeloCrawler(url, output)
-            elif url.startswith('http://manga-panda.xyz'):
-                crawler = MangaPandaCrawler(url, output)
+            try:
+                if url.startswith('https://manganelo.com'):
+                    crawler = ManganeloCrawler(url, output)
+                elif url.startswith('http://manga-panda.xyz'):
+                    crawler = MangaPandaCrawler(url, output)
+
+            except ValueError as err:
+                console.error(str(err))
 
             crawler.numChapterThreads = cthreads
             crawler.numPageThreads = pthreads
